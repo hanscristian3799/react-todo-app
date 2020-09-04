@@ -1,23 +1,22 @@
 import React from 'react';
+import { deleteTodo, finishTodo, setMode } from '../redux/todo/actions';
+import { connect } from 'react-redux';
 
-const Todo = ({todo, setTodos, todos}) => {
+const Todo = (props) => {
 
     const deleteHandler = () => {
-        setTodos(todos.filter(el => el.id !== todo.id));
+        props.deleteTodo(props.todo.id);
+        props.setMode("all");
     };
 
     const completedHandler = () => {
-        setTodos(todos.map(el  => {
-            if(el.id === todo.id) {
-                return {...el, completed: !el.completed};
-            }
-            return el;
-        }));
+        props.finishTodo(props.todo.id);
+        props.setMode("all");
     };
 
     return (
         <div className="todo">
-            <li className={`todo-item ${todo.completed === true ? 'completed' : ''}`}>{todo.name}</li>
+            <li className={`todo-item ${props.todo.completed === true ? 'completed' : ''}`}>{props.todo.name}</li>
             <button onClick={completedHandler} className="complete-btn">
                 <i className="fas fa-check"></i>
             </button>
@@ -28,4 +27,12 @@ const Todo = ({todo, setTodos, todos}) => {
     )
 }
 
-export default Todo;
+const mapDispatchToProps = (dispatch) => {
+    return {
+        deleteTodo: (id) => dispatch(deleteTodo(id)),
+        finishTodo: (id) => dispatch(finishTodo(id)), 
+        setMode: (mode) => dispatch(setMode(mode))
+    }
+}
+
+export default connect(null, mapDispatchToProps)(Todo);

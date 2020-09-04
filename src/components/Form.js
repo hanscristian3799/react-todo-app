@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { connect } from 'react-redux'
+import { addTodo, showCompleted, showUncompleted, getTodos, setMode } from '../redux/todo/actions'
 
-const Form = ({inputText, todos, setTodos, setInputText, status, setStatus}) => {
+const Form = (props) => {
+    const[inputText, setInputText] = useState('');
     
     const inputTextHandler = (e) => {
         setInputText(e.target.value);
@@ -11,22 +14,26 @@ const Form = ({inputText, todos, setTodos, setInputText, status, setStatus}) => 
 
         if(inputText === "") return;
 
-        setTodos([...todos, {name: inputText, completed: false, id: Math.random()*1000}]);
+        props.addTodo(inputText);
+        
+
         setInputText('');
+        props.setMode('all');
     }
 
     const statusHandler = (e) => {
-        setStatus(e.target.value);    
+        props.setMode(e.target.value);
     }
 
     return (
         <form>
+            {/* <h1>{ props.todos }</h1> */}
             <input value={inputText} onChange={inputTextHandler} type="text" className="todo-input" />
             <button onClick={sumbitTodoHandler} className="todo-button" type="submit">
                 <i className="fas fa-plus-square"></i>
             </button>
             <div className="select">
-            <select onChange={statusHandler} name="todos" className="filter-todo">
+            <select onChange={statusHandler} value={props.mode} name="todos" className="filter-todo">
                 <option value="all">All</option>
                 <option value="completed">Completed</option>
                 <option value="uncompleted">Uncompleted</option>
@@ -36,4 +43,21 @@ const Form = ({inputText, todos, setTodos, setInputText, status, setStatus}) => 
     );
 }
 
-export default Form;
+const mapStateToProps = (state) => {
+    return {
+        todos: state.filteredList,
+        mode: state.mode
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        addTodo: (name) => dispatch(addTodo(name)),
+        showCompleted: () => dispatch(showCompleted()),
+        showUncompleted: () => dispatch(showUncompleted()),
+        getAll: () => dispatch(getTodos()),
+        setMode: (mode) => dispatch(setMode(mode)),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Form);
